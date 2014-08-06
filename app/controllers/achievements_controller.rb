@@ -58,6 +58,7 @@ class AchievementsController < ApplicationController
   end
 
   def create
+    fetch_data_for_form
     @achievement.creator = current_user
     @achievement.update_requirement(params[:reqids], params[:new_reqs])
     respond_to do |format|
