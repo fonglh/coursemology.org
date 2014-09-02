@@ -32,8 +32,21 @@ var path = function(){
             eval: []
         },
 
+        removeEmptyTestCases: function(data){
+            var tcType = JSON.parse($("#tc-type-data").val());
+            for (var type in tcType) {
+                var tests = data[type];
+                for (var i = tests.length-1; i >= 0; --i ){
+                    if (tests[i].expected == "" || tests[i].expression == ""){
+                        tests.splice(i,1);
+                    }
+                }
+            }
+        },
+
         saveQuestion: function(){
             saving = true;
+            path.removeEmptyTestCases(path.data);
             $dataInput.val(JSON.stringify(path.data));
         },
         initialize: function() {
@@ -135,6 +148,7 @@ $(document).ready(function() {
             var options = {
                 mode: {name: language, version: version, singleLineStringErrors: false},
                 lineNumbers: true,
+                indentUnit: 4,
                 tabMode: "shift",
                 matchBrackets: true,
 //                TODO: refactor theme

@@ -87,7 +87,9 @@ class CourseAbility  < Ability
     if user_course.is_student?
       can :participate, Course
       can :read, UserCourse
-      can :read, Announcement, Announcement.published
+      can :read, Announcement, Announcement.published do |ann|
+        ann.publish_at <= Time.now
+      end
 
       # Materials: The file is accessible to students if the student uploaded
       # the file, or course staff uploaded the file.
@@ -147,6 +149,7 @@ class CourseAbility  < Ability
       can :read, [LessonPlanMilestone], is_publish: true
 
       can :read, Assessment, published: true
+      can :access_denied, Assessment
       can :read, [Assessment::Mission, Assessment::Training], assessment: {published: true}
       can :read, Survey, publish: true
 

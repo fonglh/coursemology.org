@@ -9,6 +9,8 @@ class Assessment::Answer < ActiveRecord::Base
 
   scope :finalised,  -> { where(finalised: true) }
 
+  attr_accessible :std_course_id, :question_id, :content, :submission_id, :attempt_left
+
   belongs_to  :question, class_name: Assessment::Question
   belongs_to  :std_course, class_name: "UserCourse"
   belongs_to  :submission, class_name: Assessment::Submission
@@ -27,7 +29,7 @@ class Assessment::Answer < ActiveRecord::Base
   # end
 
   def self.unique_attempts(correct = nil)
-    options = Assessment::AnswerOption.select(:option_id).where("assessment_answer_options.answer_id IN (?)", self.all).
+    options = Assessment::AnswerOption.select(:option_id).where(answer_id: self.pluck(:as_answer_id)).
         joins("LEFT JOIN assessment_mcq_options ON assessment_mcq_options.id = assessment_answer_options.option_id").uniq
     if correct.nil?
       options

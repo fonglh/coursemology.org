@@ -1,6 +1,7 @@
 class Assessment::Grading < ActiveRecord::Base
   acts_as_paranoid
 
+  attr_accessible :grade, :std_course_id, :exp
   belongs_to :grader, class_name: User
   belongs_to :grader_course, class_name: UserCourse
   belongs_to :student, class_name: UserCourse, foreign_key: :std_course_id
@@ -28,7 +29,11 @@ class Assessment::Grading < ActiveRecord::Base
   end
 
   def update_grade
-    self.grade = answer_gradings.sum(&:grade)
+    self.grade = answer_gradings.
+        joins(:answer).
+        where("question_id is not null").
+        group(:question_id).
+        map{|x| x.grade}.sum()
   end
 
   def update_exp_transaction
@@ -48,10 +53,11 @@ class Assessment::Grading < ActiveRecord::Base
     self.exp_transaction.exp = self.exp || (self.grade || 0) * asm.exp / asm.max_grade
     if submission.has_multiplier?
       self.exp_transaction.exp *= submission.multiplier
-    else
-      self.exp_transaction.exp += submission.get_bonus
     end
 
+    if self.submission.done?
+      self.exp_transaction.exp += submission.get_bonus
+    end
     self.exp_transaction.save
   end
 
