@@ -249,11 +249,16 @@ $(document).ready(function () {
       //adapted from
       //http://stackoverflow.com/questions/19682706/how-do-you-close-the-iris-colour-picker-when-you-click-away-from-it
       $(document).click(function(e) {
-        if (!$(e.target).is(".scribing-color-val .iris-picker .iris-picker-inner")) {
+        //only hide the color picker when there is something to hide
+        //explicitly checking for this allows links to be clicked when no color
+        //pickers are visible
+        if ($('.iris-picker').css('display') == 'block'
+            && !$(e.target).is(".scribing-color-val .iris-picker .iris-picker-inner")) {
           $('.scribing-color-val').iris('hide');
+          return false;
         }
       });
-      //this bit is needed so iris will come up and stay upwhen the textbox is clicked
+      //this bit is needed so iris will come up and stay up when the textbox is clicked
       $('.scribing-color-val').click(function(event) {
         $('.scribing-color-val').iris('hide');
         $(this).iris('show');
